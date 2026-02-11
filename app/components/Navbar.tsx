@@ -19,13 +19,13 @@ export default function Navbar() {
       {/* RIGHT - ADMIN */}
       <div className="flex items-center gap-4">
         <span className="font-semibold text-gray-700">
-          ADMIN
+          User
         </span>
 
         <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
           <Image
             src="/images/User.png"
-            alt="Admin"
+            alt="User"
             width={22}
             height={22}
             
