@@ -2,7 +2,12 @@
 
 import Image from 'next/image'
 
-export default function Navbar() {
+type Props = {
+  setActiveMenu: (menu: string) => void
+}
+
+export default function Navbar({ setActiveMenu }: Props) {
+
   return (
     <header className="w-full h-20 bg-white rounded-2xl px-6 flex items-center justify-between">
 
@@ -16,8 +21,11 @@ export default function Navbar() {
         />
       </div>
 
-      {/* RIGHT - ADMIN */}
-      <div className="flex items-center gap-4">
+      {/* RIGHT - USER */}
+      <button
+        onClick={() => setActiveMenu("profile")}
+        className="flex items-center gap-4"
+      >
         <span className="font-semibold text-gray-700">
           User
         </span>
@@ -28,10 +36,9 @@ export default function Navbar() {
             alt="User"
             width={22}
             height={22}
-            
           />
         </div>
-      </div>
+      </button>
 
     </header>
   )

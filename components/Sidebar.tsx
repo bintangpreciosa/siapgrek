@@ -9,28 +9,44 @@ type Props = {
 
 export default function Sidebar({ active, setActive }: Props) {
 
-  const menu = [
+  const mainMenu = [
     { name: 'dashboard', label: 'Dashboard', icon: '/images/Dashboard.png' },
     { name: 'penyakit', label: 'Penyakit', icon: '/images/Penyakit.png' },
-    { name: 'anomali', label: 'Deteksi Anomali', icon: '/images/DeteksiAnomali.png' },
     { name: 'log', label: 'Log Aktivitas', icon: '/images/Log Aktivitas.png' },
     { name: 'chat', label: 'Chat', icon: '/images/Chat.png' },
   ]
 
+  const profileMenu = [
+    { name: 'profile', label: 'Profile', icon: '/images/profile.svg' },
+    { name: 'password', label: 'Ganti Password', icon: '/images/password.svg' },
+    { name: 'logout', label: 'Keluar', icon: '/images/logout.svg' },
+  ]
+
+  // 🔥 pilih menu
+  const menu = active === "myprofile" || active === "profile" || active === "password"
+    ? profileMenu
+    : mainMenu
+
   return (
-    <aside className="w-72 bg-white rounded-3xl  p-6 flex flex-col">
+    <aside className="w-72 bg-white rounded-3xl p-6 flex flex-col">
+
       <nav className="space-y-4">
+
         {menu.map(item => {
+
           const isActive = active === item.name
 
           return (
             <button
               key={item.name}
               onClick={() => setActive(item.name)}
-              className={`flex items-center gap-4 px-6 py-3 rounded-xl w-full text-left font-medium transition
+              className={`
+                flex items-center gap-4 px-6 py-3 
+                rounded-xl w-full text-left font-medium transition
                 ${isActive
                   ? 'bg-selected text-primary'
-                  : 'text-gray-500 hover:bg-gray-100'}
+                  : 'text-gray-500 hover:bg-gray-100'
+                }
               `}
             >
               <Image
@@ -40,11 +56,15 @@ export default function Sidebar({ active, setActive }: Props) {
                 height={24}
                 className={isActive ? '' : 'grayscale opacity-40'}
               />
+
               {item.label}
+
             </button>
           )
         })}
+
       </nav>
+
     </aside>
   )
 }

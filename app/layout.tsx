@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { poppins, momoTrust } from "./fonts"; // import dari fonts.ts
+import { poppins, momoTrust } from "./fonts";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "SIAPGrek",
@@ -16,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${poppins.variable} ${momoTrust.variable}`}>
+    <html lang="id" className={cn(poppins.variable, momoTrust.variable, "font-sans", geist.variable)}>
       <body className={`${poppins.className} bg-white text-gray-900`}>
         {children}
       </body>

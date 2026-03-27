@@ -2,11 +2,6 @@
 
 import { useState } from "react";
 
-type Props = {
-  setActiveMenu: (menu: string) => void;
-  setSelectedGrafikId: (id: string) => void;
-};
-
 const logs = [
   {
     time: "14:02",
@@ -31,19 +26,12 @@ const logs = [
   },
 ];
 
-export default function LogAktivitas({
-  setActiveMenu,
-  setSelectedGrafikId,
-}: Props) {
+export default function LogAktivitas() {
   const [selectedId, setSelectedId] = useState("ID0001");
-
-  const handleLihatGrafik = () => {
-    setSelectedGrafikId(selectedId);
-    setActiveMenu("grafik");
-  };
 
   return (
     <div className="flex flex-col h-full gap-4">
+
       {/* TITLE */}
       <div>
         <h1 className="text-xl font-bold text-gray-800">Log Aktivitas</h1>
@@ -66,13 +54,6 @@ export default function LogAktivitas({
             <option>ID0003</option>
           </select>
         </div>
-
-        <button
-          onClick={handleLihatGrafik}
-          className="px-4 py-2 bg-primary text-white text-sm rounded-lg hover:bg-primary"
-        >
-          Lihat Grafik
-        </button>
       </div>
 
       {/* TABLE */}
@@ -111,6 +92,7 @@ export default function LogAktivitas({
                 </tr>
               ))}
           </tbody>
+
         </table>
       </div>
     </div>
