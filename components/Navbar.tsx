@@ -27,7 +27,7 @@ export default function Navbar({ setActiveMenu }: Props) {
         className="flex items-center gap-4"
       >
         <span className="font-semibold text-gray-700">
-          User
+          Hailey Williams
         </span>
 
         <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
