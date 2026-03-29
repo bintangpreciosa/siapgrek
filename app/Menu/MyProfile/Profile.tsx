@@ -1,37 +1,53 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 import Cropper from "react-easy-crop";
 import { momoTrust } from "../../fonts";
-
+import { useUser } from "@/app/context/UserContext";
+import Snackbar from "@/components/Snackbar";
 
 export default function Profile() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { profileImage, setProfileImage, username, setUsername } = useUser();
+
   const [form, setForm] = useState({
-    name: "Hailey Williams",
+    name: username,
     email: "haileywilliams@gmail.com",
     gender: "Perempuan",
     domisili: "Bandung"
   });
 
-  /* ================================
-     IMAGE STATE
-  ================================= */
-
-  const [image, setImage] = useState("/images/User.png");
+  const [image, setImage] = useState(profileImage);
   const [tempImage, setTempImage] = useState<string | null>(null);
 
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
 
   const [showCrop, setShowCrop] = useState(false);
 
+  useEffect(() => {
+  setForm(prev => ({
+    ...prev,
+    name: username
+  }));
+
+  setImage(profileImage);
+
+}, [username, profileImage]);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    type: "success" as "success" | "error"
+  });
+
 
   /* ================================
-     FORM CHANGE
+     HANDLE FORM
   ================================= */
 
   const handleChange = (
@@ -45,27 +61,101 @@ export default function Profile() {
 
 
   /* ================================
-     UPLOAD IMAGE
+     HANDLE UPLOAD
   ================================= */
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 
     const file = e.target.files?.[0];
 
-    if (file) {
+    if (!file) return;
 
-      const reader = new FileReader();
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
-      reader.onloadend = () => {
+    if (!allowedTypes.includes(file.type)) {
 
-        setTempImage(reader.result as string);
-        setShowCrop(true);
+      setSnackbar({
+        open: true,
+        message: "Format foto harus JPG, PNG, atau WEBP",
+        type: "error"
+      });
 
-      };
-
-      reader.readAsDataURL(file);
-
+      return;
     }
+
+    const maxSize = 2 * 1024 * 1024;
+
+    if (file.size > maxSize) {
+
+      setSnackbar({
+        open: true,
+        message: "Ukuran foto maksimal 2MB",
+        type: "error"
+      });
+
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+
+      setTempImage(reader.result as string);
+      setShowCrop(true);
+
+    };
+
+    reader.readAsDataURL(file);
+
+  };
+
+
+  /* ================================
+     CROP
+  ================================= */
+
+  const onCropComplete = useCallback((_: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+
+const createImage = (url: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = document.createElement("img");
+
+    image.onload = () => resolve(image);
+    image.onerror = (error) => reject(error);
+
+    image.src = url;
+  });
+
+
+  const getCroppedImg = async (
+    imageSrc: string,
+    pixelCrop: any
+  ) => {
+
+    const image = await createImage(imageSrc);
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
+    ctx?.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      pixelCrop.width,
+      pixelCrop.height
+    );
+
+    return canvas.toDataURL("image/jpeg");
 
   };
 
@@ -74,13 +164,63 @@ export default function Profile() {
      SAVE CROP
   ================================= */
 
-  const handleSaveCrop = () => {
+  const handleSaveCrop = async () => {
 
-    if (tempImage) {
-      setImage(tempImage);
+    try {
+
+      const croppedImage = await getCroppedImg(
+        tempImage!,
+        croppedAreaPixels
+      );
+
+      setImage(croppedImage);
+      setProfileImage(croppedImage);
+
+      setSnackbar({
+        open: true,
+        message: "Foto profil berhasil diperbarui",
+        type: "success"
+      });
+
+      setShowCrop(false);
+
+    } catch (e) {
+
+      setSnackbar({
+        open: true,
+        message: "Gagal crop gambar",
+        type: "error"
+      });
+
     }
 
-    setShowCrop(false);
+  };
+
+
+  /* ================================
+     SAVE FORM
+  ================================= */
+
+  const handleSave = () => {
+
+    if (!form.name || !form.email) {
+
+      setSnackbar({
+        open: true,
+        message: "Data belum lengkap",
+        type: "error"
+      });
+
+      return;
+    }
+
+    setUsername(form.name);
+
+    setSnackbar({
+      open: true,
+      message: "Profil berhasil disimpan",
+      type: "success"
+    });
 
   };
 
@@ -91,12 +231,15 @@ export default function Profile() {
 
       {/* TITLE */}
       <div className="mb-9">
+
         <h2 className={`${momoTrust.className} text-2xl font-bold text-primary mb-2`}>
           Profile Saya
         </h2>
+
         <p className="text-gray-600 text-[14px]">
           Atur detail profile kamu.
         </p>
+
       </div>
 
 
@@ -132,17 +275,15 @@ export default function Profile() {
       </div>
 
 
-      {/* ================================
-         MODAL CROP
-      ================================= */}
+      {/* MODAL CROP */}
 
       {showCrop && tempImage && (
 
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
 
-          <div className="bg-white rounded-2xl p-6 w-[400px]">
+          <div className="bg-white rounded-2xl p-6 w-[420px]">
 
-            <div className="relative w-full h-[300px]">
+            <div className="relative w-full h-[320px]">
 
               <Cropper
                 image={tempImage}
@@ -153,11 +294,11 @@ export default function Profile() {
                 showGrid={false}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
               />
 
             </div>
 
-            {/* ZOOM */}
             <div className="mt-4">
 
               <input
@@ -171,7 +312,6 @@ export default function Profile() {
               />
 
             </div>
-
 
             <div className="flex justify-end gap-3 mt-4">
 
@@ -198,12 +338,10 @@ export default function Profile() {
       )}
 
 
-      {/* ================================
-         FORM (TIDAK DIUBAH)
-      ================================= */}
+      {/* FORM */}
 
-      {/* NAMA */}
       <div className="mb-4">
+
         <label className="block text-gray-700 mb-2 text-sm font-medium">
           Nama Lengkap
         </label>
@@ -213,13 +351,14 @@ export default function Profile() {
           name="name"
           value={form.name}
           onChange={handleChange}
-          className="w-full rounded-full border border-gray-300 px-4 py-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full rounded-full border px-4 py-3"
         />
+
       </div>
 
 
-      {/* EMAIL */}
       <div className="mb-4">
+
         <label className="block text-gray-700 mb-2 text-sm font-medium">
           Email
         </label>
@@ -229,64 +368,34 @@ export default function Profile() {
           name="email"
           value={form.email}
           onChange={handleChange}
-          className="w-full rounded-full border border-gray-300 px-4 py-3 text-[14px] focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full rounded-full border px-4 py-3"
         />
+
       </div>
 
 
-      {/* JENIS KELAMIN */}
-    <div className="mb-4">
-    <label className="block text-gray-700 mb-2 text-sm font-medium">
-        Jenis Kelamin
-    </label>
+      <div className="mb-4">
 
-    <div className="relative">
+        <label className="block text-gray-700 mb-2 text-sm font-medium">
+          Jenis Kelamin
+        </label>
 
         <select
-        name="gender"
-        value={form.gender}
-        onChange={handleChange}
-        className="
-            w-full
-            rounded-full
-            border border-gray-300
-            px-4 py-3 pr-12
-            text-[14px]
-            appearance-none
-            focus:outline-none
-            focus:ring-2
-            focus:ring-primary
-        "
+          name="gender"
+          value={form.gender}
+          onChange={handleChange}
+          className="w-full rounded-full border px-4 py-3"
         >
-        <option>Perempuan</option>
-        <option>Laki-laki</option>
+          <option>Perempuan</option>
+          <option>Laki-laki</option>
         </select>
 
-        {/* ICON DROPDOWN */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-        <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-gray-500"
-        >
-            <polyline points="6 9 12 15 18 9" />
-        </svg>
-        </div>
-
-    </div>
-
-    </div>
+      </div>
 
 
-      {/* DOMISILI */}
       <div className="mb-6">
-        <label className="text-sm text-gray-600">
+
+        <label className="block text-gray-700 mb-2 text-sm font-medium">
           Domisili
         </label>
 
@@ -295,16 +404,28 @@ export default function Profile() {
           name="domisili"
           value={form.domisili}
           onChange={handleChange}
-          className="w-full mt-2 px-5 py-3 rounded-full border outline-none"
+          className="w-full rounded-full border px-4 py-3"
         />
+
       </div>
 
 
       <button
-        className="w-full rounded-full bg-primary py-3 text-white font-semibold text-lg hover:bg-primary/80 transition"
+        onClick={handleSave}
+        className="w-full rounded-full bg-primary py-3 text-white"
       >
         Simpan
       </button>
+
+
+      <Snackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        type={snackbar.type}
+        onClose={() =>
+          setSnackbar({ ...snackbar, open: false })
+        }
+      />
 
     </div>
   );
