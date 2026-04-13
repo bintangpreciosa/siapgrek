@@ -9,13 +9,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  Legend
+  ResponsiveContainer
 } from "recharts";
 
 import RangeGrafik from "../../components/RangeGrafik";
 import IntervalGrafik from "../../components/IntervalGrafik";
-import ParameterGrafik from "../../components/ParameterGrafik";
 
 type Props = {
   setActiveMenu: (menu: string) => void;
@@ -25,13 +23,14 @@ type Props = {
    PARAMETER CONFIG
 ================================ */
 const parameterMap: any = {
-  "Env temp": { key: "envTemp", color: "#7C3AED" },
-  "Env hum": { key: "envHum", color: "#10B981" },
-  "Soil temp": { key: "soilTemp", color: "#F97316" },
-  "Soil hum": { key: "soilHum", color: "#0EA5E9" },
-  "Soil pH": { key: "soilPH", color: "#EC4899" },
-  "Soil conductivity": { key: "soilEC", color: "#F43F5E" },
-  Light: { key: "light", color: "#EAB308" }
+  envTemp: { label: "Temperature (Env)", color: "#7C3AED" },
+  envHum: { label: "Humidity (Env)", color: "#10B981" },
+  light: { label: "Light Intensity", color: "#EAB308" },
+
+  soilTemp: { label: "Temperature (Soil)", color: "#F97316" },
+  soilHum: { label: "Humidity (Soil)", color: "#0EA5E9" },
+  soilPH: { label: "pH", color: "#EC4899" },
+  soilEC: { label: "Conductivity", color: "#F43F5E" }
 };
 
 /* ===============================
@@ -69,7 +68,7 @@ function getIntervalMinutes(interval: string) {
 }
 
 /* ===============================
-   GENERATE DATA DINAMIS
+   GENERATE DATA
 ================================ */
 function generateData(range: string, interval: string) {
   const data: any[] = [];
@@ -111,6 +110,54 @@ function generateData(range: string, interval: string) {
 }
 
 /* ===============================
+   CHART CARD
+================================ */
+function ChartCard({
+  title,
+  dataKey,
+  color,
+  data
+}: any) {
+  return (
+    <div className="bg-white rounded-xl p-3 shadow-sm">
+      <h3 className="text-xs font-semibold mb-1">
+        {title}
+      </h3>
+
+      <ResponsiveContainer width="100%" height={160}>
+        <AreaChart data={data}>
+
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+
+          <XAxis
+            dataKey="label"
+            tick={{ fontSize: 10 }}
+          />
+
+          <YAxis
+            tick={{ fontSize: 10 }}
+            domain={["auto", "auto"]}
+          />
+
+          <Tooltip />
+
+          <Area
+            type="monotone"
+            dataKey={dataKey}
+            stroke={color}
+            fill={color}
+            fillOpacity={0.2}
+            strokeWidth={2}
+            dot={false}
+          />
+
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+/* ===============================
    COMPONENT
 ================================ */
 export default function GrafikTanaman({
@@ -119,11 +166,6 @@ export default function GrafikTanaman({
 
   const [range, setRange] = useState("today");
   const [interval, setInterval] = useState("1 hour");
-
-  const [parameters, setParameters] = useState<string[]>([
-    "Env temp",
-    "Env hum"
-  ]);
 
   const chartData = useMemo(
     () => generateData(range, interval),
@@ -151,79 +193,79 @@ export default function GrafikTanaman({
       <div className="flex gap-4 items-start">
         <RangeGrafik value={range} onChange={setRange} />
         <IntervalGrafik value={interval} onChange={setInterval} />
-        <ParameterGrafik value={parameters} onChange={setParameters} />
       </div>
 
-      {/* CHART */}
-      <div className="flex-1 flex justify-center">
-        <div className="w-full max-w-6xl bg-white rounded-2xl p-6 shadow-sm">
+      {/* ENV SECTION */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">
+          Environment Sensor
+        </h2>
 
-          <ResponsiveContainer width="100%" height={450}>
-            <AreaChart data={chartData}>
+        <div className="grid grid-cols-3 gap-3">
 
-              {/* 🔥 GRADIENT */}
-              <defs>
-                <linearGradient id="gradientZone" x1="0" y1="1" x2="0" y2="0">
-                  <stop offset="0%" stopColor="#22c55e" stopOpacity={0.7} />
-                  <stop offset="50%" stopColor="#facc15" stopOpacity={0.7} />
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.7} />
-                </linearGradient>
-              </defs>
+          <ChartCard
+            title="Temperature (Env)"
+            dataKey="envTemp"
+            color="#7C3AED"
+            data={chartData}
+          />
 
-              {/* GRID */}
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="#e5e7eb"
-              />
+          <ChartCard
+            title="Humidity (Env)"
+            dataKey="envHum"
+            color="#10B981"
+            data={chartData}
+          />
 
-              {/* X */}
-              <XAxis
-                dataKey="label"
-                tick={{ fontSize: 12 }}
-                tickMargin={10}
-              />
-
-              {/* Y */}
-              <YAxis
-                tick={{ fontSize: 12 }}
-                domain={["auto", "auto"]}
-              />
-
-              {/* TOOLTIP */}
-              <Tooltip
-                contentStyle={{
-                  borderRadius: "10px",
-                  border: "none",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.1)"
-                }}
-              />
-
-              {/* LEGEND */}
-              <Legend />
-
-              {/* 🔥 AREA + LINE */}
-              {parameters.map((param) => {
-                const config = parameterMap[param];
-
-                return (
-                  <Area
-                    key={param}
-                    type="monotone"
-                    dataKey={config.key}
-                    stroke={config.color}
-                    strokeWidth={3}
-                    fill="url(#gradientZone)"
-                    dot={false}
-                    activeDot={{ r: 6 }}
-                  />
-                );
-              })}
-
-            </AreaChart>
-          </ResponsiveContainer>
+          <ChartCard
+            title="Light Intensity"
+            dataKey="light"
+            color="#EAB308"
+            data={chartData}
+          />
 
         </div>
       </div>
+
+      {/* SOIL SECTION */}
+      <div>
+        <h2 className="text-lg font-semibold mt-4 mb-3">
+          Soil Sensor
+        </h2>
+
+        <div className="grid grid-cols-4 gap-3">
+
+          <ChartCard
+            title="Temperature (Soil)"
+            dataKey="soilTemp"
+            color="#F97316"
+            data={chartData}
+          />
+
+          <ChartCard
+            title="Humidity (Soil)"
+            dataKey="soilHum"
+            color="#0EA5E9"
+            data={chartData}
+          />
+
+          <ChartCard
+            title="pH"
+            dataKey="soilPH"
+            color="#EC4899"
+            data={chartData}
+          />
+
+          <ChartCard
+            title="Conductivity"
+            dataKey="soilEC"
+            color="#F43F5E"
+            data={chartData}
+          />
+
+        </div>
+      </div>
+
     </div>
   );
 }
