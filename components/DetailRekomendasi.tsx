@@ -6,6 +6,7 @@ import SensorCard from "./SensorCard"
 type Props = {
   open: boolean
   onClose: () => void
+  setActiveMenu: (menu: string) => void
 }
 
 function getScore(value:number,type:string){
@@ -37,14 +38,14 @@ function getScore(value:number,type:string){
   return 0
 }
 
-export default function DetailRekomendasi({ open, onClose }: Props) {
+export default function DetailRekomendasi({ open, onClose, setActiveMenu }: Props) {
 
   if (!open) return null
 
   /** DATA SENSOR (sementara statis) */
   const temp = 35
   const moist = 75
-  const ph = 6.5
+  const ph = 6.7
   const ec = 1.8
 
   /** HITUNG SKOR */
@@ -77,6 +78,21 @@ export default function DetailRekomendasi({ open, onClose }: Props) {
   : color==="orange"
   ? "bg-orange-100 text-orange-600"
   : "bg-red-100 text-red-500"
+
+  const insightText = `
+Tanaman menunjukkan kondisi yang perlu diperhatikan.
+Suhu lingkungan terlalu tinggi dan kelembapan tanah
+berlebih. Disarankan meningkatkan sirkulasi udara,
+mengurangi frekuensi penyiraman, serta memantau kondisi
+pH tanah secara berkala agar kondisi tanaman kembali
+optimal.
+`
+
+  const handleTanyaAI = () => {
+    localStorage.setItem("chatInsight", insightText)
+    setActiveMenu("chat")
+    onClose()
+  }
 
   return (
     <div
@@ -175,20 +191,24 @@ export default function DetailRekomendasi({ open, onClose }: Props) {
                 height={30}
               />
 
-              <p className="text-gray-700 font-medium mb-10">
+              <p className="text-gray-700 font-medium mb-4">
                 Rekomendasi Perlakuan
               </p>
             </div>
 
-            <div className="mt-6">
-              <p className="text-gray-700 leading-relaxed">
-                Tanaman menunjukkan kondisi yang perlu diperhatikan.
-                Suhu lingkungan terlalu tinggi dan kelembapan tanah
-                berlebih. Disarankan meningkatkan sirkulasi udara,
-                mengurangi frekuensi penyiraman, serta memantau kondisi
-                pH tanah secara berkala agar kondisi tanaman kembali
-                optimal.
+            <div className="mt-4">
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                {insightText}
               </p>
+            </div>
+
+            <div className="mt-6">
+              <button
+                onClick={handleTanyaAI}
+                className="w-full bg-primary text-white py-3 rounded-xl font-medium"
+              >
+                Tanya AI
+              </button>
             </div>
           </div>
 
@@ -204,3 +224,5 @@ export default function DetailRekomendasi({ open, onClose }: Props) {
     </div>
   )
 }
+
+

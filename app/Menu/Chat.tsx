@@ -8,19 +8,39 @@ type ChatMessage = {
 };
 
 export default function Chat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "assistant",
-      content:
-        "Halo, saya asisten SIAPGrek. Silakan tanya apa saja seputar sistem monitoring ini 😊",
-    },
-  ]);
+
+  // 🔥 Ambil insight langsung saat init
+  const initialMessages = (() => {
+    if (typeof window !== "undefined") {
+      const insight = localStorage.getItem("chatInsight");
+
+      if (insight) {
+        localStorage.removeItem("chatInsight");
+        return [
+          {
+            role: "assistant" as const,
+            content: insight,
+          },
+        ];
+      }
+    }
+
+    return [
+      {
+        role: "assistant" as const,
+        content:
+          "Halo, saya asisten SIAPGrek. Silakan tanya apa saja seputar sistem monitoring ini 😊",
+      },
+    ];
+  })();
+
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // 🔽 Auto scroll ke pesan terbaru
+  // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
@@ -85,7 +105,8 @@ export default function Chat() {
 
       {/* CHAT CONTAINER */}
       <div className="flex-1 bg-white rounded-2xl shadow-md flex flex-col min-h-0">
-        {/* CHAT MESSAGES (SCROLLABLE) */}
+        
+        {/* CHAT MESSAGES */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((msg, idx) => (
             <div
@@ -107,14 +128,15 @@ export default function Chat() {
           ))}
 
           {loading && (
-            <p className="text-xs text-gray-400">AI sedang mengetik...</p>
+            <p className="text-xs text-gray-400">
+              AI sedang mengetik...
+            </p>
           )}
 
-          {/* Auto scroll anchor */}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* INPUT (FIXED BOTTOM) */}
+        {/* INPUT */}
         <form
           onSubmit={handleSubmit}
           className="border-t border-gray-100 p-3 flex gap-2 flex-shrink-0"
@@ -126,14 +148,17 @@ export default function Chat() {
             placeholder="Ketik pesan di sini..."
             className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
+
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-selected disabled:opacity-60 hover:text-primary transition"
+            className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-selected disabled:opacity-60 transition"
           >
             {loading ? "Mengirim..." : "Kirim"}
           </button>
+
         </form>
+
       </div>
     </div>
   );
