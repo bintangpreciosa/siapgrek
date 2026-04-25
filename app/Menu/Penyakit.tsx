@@ -16,125 +16,118 @@ export default function Penyakit() {
   const [rows, setRows] = useState<DiseaseRow[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleUploadClick = () => fileInputRef.current?.click();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const url = URL.createObjectURL(file);
-
     const today = new Date().toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
+      day: "numeric", month: "long", year: "numeric",
     });
-
-    // sementara deteksinya dummy, nanti bisa diganti hasil dari API / model ML
-    const newRow: DiseaseRow = {
-      id: rows.length + 1,
+    setRows(prev => [...prev, {
+      id: prev.length + 1,
       imgUrl: url,
       result: "Busuk Daun",
       accuracy: "98,83%",
       description: "Tidak ada deskripsi",
       date: today,
-    };
-
-    setRows((prev) => [...prev, newRow]);
-
-    // reset input agar bisa upload file yang sama lagi kalau perlu
+    }]);
     e.target.value = "";
   };
 
   return (
-    <div className="space-y-6">
-      {/* TITLE */}
-      <h1 className="text-2xl font-bold text-gray-900">
-        Klasifikasi Penyakit
-      </h1>
+    <div className="space-y-4">
 
-      {/* BUTTON + INPUT HIDDEN */}
+      {/* TITLE */}
+      <div>
+        <h1 className="text-base lg:text-xl font-bold text-gray-900">Klasifikasi Penyakit</h1>
+        <p className="text-xs lg:text-sm text-gray-500 mt-0.5">Unggah foto daun anggrek untuk mendeteksi penyakit</p>
+      </div>
+
+      {/* UPLOAD BUTTON */}
       <div>
         <button
           type="button"
           onClick={handleUploadClick}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold shadow hover:bg-blue-700 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-xs lg:text-sm font-semibold shadow hover:bg-blue-700 transition"
         >
-          <ImagePlus size={18} />
+          <ImagePlus size={16} />
           Unggah Foto
         </button>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       </div>
 
-      {/* TABEL */}
-      <div className="mt-2 bg-white rounded-2xl p-4 shadow-sm">
-        <table className="w-full text-sm text-left text-gray-700">
+      {/* DESKTOP TABLE — hidden on mobile */}
+      <div className="hidden sm:block bg-white rounded-2xl p-3 lg:p-4 shadow-sm overflow-x-auto">
+        <table className="w-full text-xs lg:text-sm text-left text-gray-700">
           <thead>
-            <tr className="border-b border-gray-300">
-              <th className="py-3">No</th>
-              <th className="py-3">Gambar</th>
-              <th className="py-3">Hasil</th>
-              <th className="py-3">Akurasi</th>
-              <th className="py-3">Deskripsi</th>
-              <th className="py-3">Tanggal</th>
-              <th className="py-3">Aksi</th>
+            <tr className="border-b border-gray-200">
+              {["No", "Gambar", "Hasil", "Akurasi", "Deskripsi", "Tanggal", "Aksi"].map(h => (
+                <th key={h} className="py-2.5 pr-4 font-semibold text-gray-600">{h}</th>
+              ))}
             </tr>
           </thead>
-
           <tbody>
-            {rows.length === 0 && (
+            {rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={7}
-                  className="py-6 text-center text-gray-400 text-sm"
-                >
+                <td colSpan={7} className="py-8 text-center text-gray-400 text-xs">
                   Belum ada data. Unggah foto untuk mulai klasifikasi.
                 </td>
               </tr>
-            )}
-
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-gray-200">
-                <td className="py-3">{row.id}</td>
-
-                <td className="py-3">
-                  <div className="w-20 h-14 rounded overflow-hidden border">
-                    {/* pakai <img> biasa karena blob URL */}
-                    <img
-                      src={row.imgUrl}
-                      alt={row.result}
-                      className="w-full h-full object-cover"
-                    />
+            ) : rows.map(row => (
+              <tr key={row.id} className="border-b border-gray-100 hover:bg-gray-50">
+                <td className="py-2.5 pr-4">{row.id}</td>
+                <td className="py-2.5 pr-4">
+                  <div className="w-16 h-12 rounded-lg overflow-hidden border">
+                    <img src={row.imgUrl} alt={row.result} className="w-full h-full object-cover" />
                   </div>
                 </td>
-
-                <td className="py-3">
-                  <span className="inline-block rounded-full bg-green-600 text-white text-xs px-3 py-1">
+                <td className="py-2.5 pr-4">
+                  <span className="inline-block rounded-full bg-green-600 text-white text-[10px] lg:text-xs px-2.5 py-0.5">
                     {row.result}
                   </span>
                 </td>
-
-                <td className="py-3">{row.accuracy}</td>
-                <td className="py-3">{row.description}</td>
-                <td className="py-3 whitespace-pre-line">{row.date}</td>
-
-                <td className="py-3 text-blue-600 text-xs font-medium">
-                  Detail
+                <td className="py-2.5 pr-4">{row.accuracy}</td>
+                <td className="py-2.5 pr-4 max-w-[150px] truncate">{row.description}</td>
+                <td className="py-2.5 pr-4 whitespace-nowrap">{row.date}</td>
+                <td className="py-2.5">
+                  <button className="text-blue-600 text-xs font-medium hover:underline">Detail</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* MOBILE CARD LIST — hidden on desktop */}
+      <div className="sm:hidden space-y-2.5">
+        {rows.length === 0 ? (
+          <div className="bg-white rounded-2xl p-6 text-center text-gray-400 text-xs shadow-sm">
+            Belum ada data. Unggah foto untuk mulai klasifikasi.
+          </div>
+        ) : rows.map(row => (
+          <div key={row.id} className="bg-white rounded-2xl p-3 shadow-sm flex gap-3">
+            {/* FOTO */}
+            <div className="w-16 h-16 rounded-xl overflow-hidden border flex-shrink-0">
+              <img src={row.imgUrl} alt={row.result} className="w-full h-full object-cover" />
+            </div>
+            {/* INFO */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className="inline-block rounded-full bg-green-600 text-white text-[10px] px-2 py-0.5">
+                  {row.result}
+                </span>
+                <span className="text-[10px] text-gray-400">{row.date}</span>
+              </div>
+              <p className="text-[11px] text-gray-500">Akurasi: <span className="font-semibold text-gray-700">{row.accuracy}</span></p>
+              <p className="text-[11px] text-gray-500 truncate">{row.description}</p>
+            </div>
+            <button className="text-blue-600 text-[11px] font-medium self-start flex-shrink-0">Detail</button>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
 }

@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
-
 import Dashboard from './Menu/Dashboard'
 import Penyakit from './Menu/Penyakit'
 import LogAktivitas from './Menu/LogAktivitas'
@@ -13,27 +11,19 @@ import GrafikTanaman from "./Menu/GrafikTanaman"
 import MyProfile from "./Menu/MyProfile/MyProfile"
 
 export default function Page() {
-
   const [activeMenu, setActiveMenu] = useState("dashboard")
 
   const renderContent = () => {
     switch (activeMenu) {
-      case "dashboard":
-        return <Dashboard setActiveMenu={setActiveMenu} />
-      case "penyakit":
-        return <Penyakit />
-      case "log":
-        return <LogAktivitas />
-      case "grafik":
-        return <GrafikTanaman setActiveMenu={setActiveMenu} />
-      case "chat":
-        return <Chat />
+      case "dashboard": return <Dashboard setActiveMenu={setActiveMenu} />
+      case "penyakit":  return <Penyakit />
+      case "log":       return <LogAktivitas />
+      case "grafik":    return <GrafikTanaman setActiveMenu={setActiveMenu} />
+      case "chat":      return <Chat />
       case "myprofile":
       case "profile":
-      case "password":
-        return <MyProfile active={activeMenu} />
-      default:
-        return <Dashboard setActiveMenu={setActiveMenu} />
+      case "password":  return <MyProfile active={activeMenu} />
+      default:          return <Dashboard setActiveMenu={setActiveMenu} />
     }
   }
 
@@ -44,17 +34,14 @@ export default function Page() {
         <Navbar setActiveMenu={setActiveMenu} />
 
         <div className="flex flex-1 gap-2 sm:gap-3 lg:gap-5 overflow-hidden min-h-0">
+          <Sidebar active={activeMenu} setActive={setActiveMenu} />
 
-          <Sidebar
-            active={activeMenu}
-            setActive={setActiveMenu}
-          />
-
-          <main className="flex-1 bg-white rounded-2xl lg:rounded-3xl p-3 sm:p-4 lg:p-6 overflow-y-auto min-h-0">
+          {/* pb-20 md:pb-0 di sini — berlaku untuk SEMUA halaman */}
+          <main className="flex-1 bg-white rounded-2xl lg:rounded-3xl p-3 sm:p-4 lg:p-6 overflow-y-auto min-h-0 pb-20 md:pb-6">
             {renderContent()}
           </main>
-
         </div>
+
       </div>
     </div>
   )

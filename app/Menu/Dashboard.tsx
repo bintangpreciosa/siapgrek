@@ -26,7 +26,7 @@ export default function Dashboard({ setActiveMenu }: Props) {
   const currentData = soilData[selectedPlant]
 
   return (
-    <div className="space-y-3 lg:space-y-4 pb-20 md:pb-0">
+    <div className="space-y-3 lg:space-y-4">
 
       {/* TITLE */}
       <h1 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold">Dashboard Monitoring</h1>
