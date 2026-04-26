@@ -4,47 +4,32 @@ import { momoTrust } from "../fonts";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      
-      {/* LEFT SIDE */}
+    <main className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-white">
+
+      {/* LEFT — gambar, hidden mobile */}
       <div className="hidden md:flex items-center justify-center bg-white p-6">
         <div className="relative w-full h-full rounded-[7%] overflow-hidden">
-          <Image
-            src="/images/anggrek.jpg"
-            alt="Anggrek"
-            fill
-            className="object-cover"
-            priority
-          />
-
-          <div className="absolute inset-0 bg-black bg-opacity-40" />
-
-          <div className="absolute bottom-[180px] left-1/2 -translate-x-1/2 flex flex-col items-center">
-            <Image src="/images/logo.png" alt="Logo SIAPGrek!" width={150} height={55} className="object-contain" />
+          <Image src="/images/anggrek.jpg" alt="Anggrek" fill className="object-cover" priority />
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute bottom-[180px] left-1/2 -translate-x-1/2">
+            <Image src="/images/logo.png" alt="Logo" width={150} height={55} className="object-contain" />
           </div>
-
           <div className="absolute bottom-20 left-1/2 -translate-x-1/2 text-center px-4">
-            <h1
-              className={`${momoTrust.className} text-white whitespace-nowrap leading-tight`}
-              style={{
-                fontSize: "clamp(1.7rem, 2vw + 1rem, 2.6rem)",
-                lineHeight: 1.05,
-              }}
-            >
-              Sistem Informasi Automasi
-              <br />
-              Perawatan Anggrek
+            <h1 className={`${momoTrust.className} text-white whitespace-nowrap`}
+              style={{ fontSize: "clamp(1.7rem, 2vw + 1rem, 2.6rem)", lineHeight: 1.05 }}>
+              Sistem Informasi Automasi<br />Perawatan Anggrek
             </h1>
           </div>
         </div>
       </div>
 
-      {/* RIGHT SIDE */}
-      <div className="flex items-center justify-center bg-white px-6 min-h-screen overflow-hidden">
-        <div className="w-full max-w-sm md:max-w-sm lg:max-w-sm xl:max-w-sm">
+      {/* RIGHT — form */}
+      <div className="flex items-center justify-center px-6 py-8 min-h-screen">
+        <div className="w-full max-w-sm">
           <LoginForm />
         </div>
       </div>
+
     </main>
   );
 }

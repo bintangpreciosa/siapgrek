@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
 import Dashboard from './Menu/Dashboard'
@@ -10,8 +11,15 @@ import Chat from "./Menu/Chat"
 import GrafikTanaman from "./Menu/GrafikTanaman"
 import MyProfile from "./Menu/MyProfile/MyProfile"
 
-export default function Page() {
+function AppContent() {
+  const searchParams = useSearchParams()
   const [activeMenu, setActiveMenu] = useState("dashboard")
+
+  // baca ?active= dari URL (dipakai mobile-profile untuk navigasi)
+  useEffect(() => {
+    const active = searchParams.get("active")
+    if (active) setActiveMenu(active)
+  }, [searchParams])
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -30,19 +38,22 @@ export default function Page() {
   return (
     <div className="h-screen bg-gray-100 overflow-hidden">
       <div className="flex flex-col h-full p-2 sm:p-3 lg:p-5 gap-2 sm:gap-3 lg:gap-5">
-
-        <Navbar setActiveMenu={setActiveMenu} />
-
+        <Navbar setActiveMenu={setActiveMenu} activeMenu={activeMenu} />
         <div className="flex flex-1 gap-2 sm:gap-3 lg:gap-5 overflow-hidden min-h-0">
           <Sidebar active={activeMenu} setActive={setActiveMenu} />
-
-          {/* pb-20 md:pb-0 di sini — berlaku untuk SEMUA halaman */}
           <main className="flex-1 bg-white rounded-2xl lg:rounded-3xl p-3 sm:p-4 lg:p-6 overflow-y-auto min-h-0 pb-20 md:pb-6">
             {renderContent()}
           </main>
         </div>
-
       </div>
     </div>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <AppContent />
+    </Suspense>
   )
 }
