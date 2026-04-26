@@ -1,12 +1,12 @@
-import Image from "next/image";
 import LoginForm from "./LoginForm";
+import Image from "next/image";
 import { momoTrust } from "../fonts";
 
 export default function LoginPage() {
   return (
-    <main className="min-h-screen grid grid-cols-1 md:grid-cols-2 bg-white">
+    <main className="grid grid-cols-1 md:grid-cols-2 bg-white" style={{ height: "100dvh" }}>
 
-      {/* LEFT — gambar, hidden mobile */}
+      {/* LEFT — hidden mobile */}
       <div className="hidden md:flex items-center justify-center bg-white p-6">
         <div className="relative w-full h-full rounded-[7%] overflow-hidden">
           <Image src="/images/anggrek.jpg" alt="Anggrek" fill className="object-cover" priority />
@@ -23,9 +23,9 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* RIGHT — form */}
-      <div className="flex items-center justify-center px-6 py-8 min-h-screen">
-        <div className="w-full max-w-sm">
+      {/* RIGHT */}
+      <div className="flex items-center justify-center px-6 overflow-y-auto" style={{ height: "100dvh" }}>
+        <div className="w-full max-w-sm py-4">
           <LoginForm />
         </div>
       </div>

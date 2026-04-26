@@ -27,6 +27,15 @@
   html {
     @apply font-sans;
   }
+
+  /* Cegah iOS Safari auto-zoom saat fokus input */
+  @media screen and (max-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @keyframes slideUp {
