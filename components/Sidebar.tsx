@@ -13,22 +13,24 @@ export default function Sidebar({ active, setActive }: Props) {
   const [showLogout, setShowLogout] = useState(false)
 
   const mainMenu = [
-    { name: 'dashboard', label: 'Dashboard', icon: '/images/Dashboard.png' },
-    { name: 'penyakit',  label: 'Penyakit',  icon: '/images/Penyakit.png' },
-    { name: 'log',       label: 'Log Aktivitas', icon: '/images/Log Aktivitas.png' },
-    { name: 'chat',      label: 'Chat',       icon: '/images/Chat.png' },
+    { name: 'dashboard', label: 'Dashboard',     icon: '/images/Dashboard.png'      },
+    { name: 'penyakit',  label: 'Penyakit',      icon: '/images/Penyakit.png'       },
+    { name: 'log',       label: 'Log Aktivitas', icon: '/images/Log Aktivitas.png'  },
+    { name: 'chat',      label: 'Chat',           icon: '/images/Chat.png'           },
   ]
 
   const profileMenu = [
-    { name: 'profile',  label: 'Profile',        icon: '/images/profile.svg' },
-    { name: 'password', label: 'Ganti Password',  icon: '/images/password.svg' },
-    { name: 'main',     label: 'Halaman Utama',   icon: '/images/main_page.svg' },
+    { name: 'profile',  label: 'Edit Profil',    icon: '/images/profile.svg'   },
+    { name: 'password', label: 'Ganti Password', icon: '/images/password.svg'  },
+    { name: 'faq',      label: 'Pusat Bantuan',  icon: '/images/FAQ.png'       },
+    { name: 'main',     label: 'Halaman Utama',  icon: '/images/main_page.svg' },
   ]
 
   const isProfile =
     active === "myprofile" ||
-    active === "profile" ||
-    active === "password"
+    active === "profile"   ||
+    active === "password"  ||
+    active === "faq"
 
   const menu = isProfile ? profileMenu : mainMenu
 
@@ -73,7 +75,6 @@ export default function Sidebar({ active, setActive }: Props) {
         )}
       </aside>
 
-
       {/* ===== MOBILE BOTTOM NAV — disembunyikan saat di profile ===== */}
       {!isProfile && (
         <div className="md:hidden fixed bottom-3 left-3 right-3 bg-white px-3 py-2.5 rounded-2xl shadow-lg flex items-center justify-evenly z-50">
@@ -100,7 +101,6 @@ export default function Sidebar({ active, setActive }: Props) {
           })}
         </div>
       )}
-
 
       {/* ===== LOGOUT MODAL ===== */}
       {showLogout && (

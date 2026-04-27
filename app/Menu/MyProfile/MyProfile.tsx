@@ -1,26 +1,42 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Profile from "./Profile";
 import ChangePassword from "./ChangePassword";
+import FAQ from "./FAQ";
 
 type Props = {
   active: string;
+  setActive?: (menu: string) => void;
 };
 
-export default function MyProfile({ active }: Props) {
+export default function MyProfile({ active, setActive }: Props) {
+  const router = useRouter();
 
-  /* DEFAULT PROFILE */
-  if (
-    active === "profile" ||
-    active === "myprofile"
-  ) {
-    return <Profile />;
+  const handleBack = () => {
+    // Cek apakah sedang di mobile screen
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      router.push("/mobile-profile");
+      return;
+    }
+    if (setActive) setActive("profile");
+  };
+
+  const handleNavigate = (menu: string) => {
+    if (setActive) setActive(menu);
+  };
+
+  if (active === "profile" || active === "myprofile") {
+    return <Profile onBack={handleBack} />;
   }
 
-  /* PASSWORD */
   if (active === "password") {
-    return <ChangePassword />;
+    return <ChangePassword onBack={handleBack} />;
   }
 
-  return <Profile />; // fallback
+  if (active === "faq") {
+    return <FAQ onBack={handleBack} onNavigate={handleNavigate} />;
+  }
+
+  return <Profile onBack={handleBack} />;
 }

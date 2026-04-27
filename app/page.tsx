@@ -15,7 +15,6 @@ function AppContent() {
   const searchParams = useSearchParams()
   const [activeMenu, setActiveMenu] = useState("dashboard")
 
-  // baca ?active= dari URL (dipakai mobile-profile untuk navigasi)
   useEffect(() => {
     const active = searchParams.get("active")
     if (active) setActiveMenu(active)
@@ -30,7 +29,8 @@ function AppContent() {
       case "chat":      return <Chat />
       case "myprofile":
       case "profile":
-      case "password":  return <MyProfile active={activeMenu} />
+      case "password":
+      case "faq":       return <MyProfile active={activeMenu} setActive={setActiveMenu} />
       default:          return <Dashboard setActiveMenu={setActiveMenu} />
     }
   }

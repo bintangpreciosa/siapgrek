@@ -6,8 +6,11 @@ import Cropper from "react-easy-crop";
 import { momoTrust } from "../../fonts";
 import { useUser } from "@/app/context/UserContext";
 import Snackbar from "@/components/Snackbar";
+import { ChevronLeft } from "lucide-react";
 
-export default function Profile() {
+type Props = { onBack?: () => void };
+
+export default function Profile({ onBack }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { profileImage, setProfileImage, username, setUsername } = useUser();
 
@@ -32,7 +35,7 @@ export default function Profile() {
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!["image/jpeg","image/png","image/webp"].includes(file.type)) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
       setSnackbar({ open: true, message: "Format foto harus JPG, PNG, atau WEBP", type: "error" }); return;
     }
     if (file.size > 2 * 1024 * 1024) {
@@ -78,14 +81,24 @@ export default function Profile() {
   return (
     <div className="w-full max-w-xl">
 
-      {/* TITLE */}
-      <div className="mb-5 lg:mb-8">
-        <h2 className={`${momoTrust.className} text-xl lg:text-2xl font-bold text-primary mb-1`}>Profile Saya</h2>
-        <p className="text-gray-500 text-xs lg:text-sm">Atur detail profile kamu.</p>
+      {/* TITLE — back button hanya mobile (md:hidden) */}
+      <div className="flex items-center gap-3 mb-5 lg:mb-7">
+        {onBack && (
+          <button onClick={onBack}
+            className="md:hidden w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition flex-shrink-0">
+            <ChevronLeft size={18} className="text-gray-600" />
+          </button>
+        )}
+        <div>
+          <h2 className={`${momoTrust.className} text-xl lg:text-2xl font-bold text-primary leading-tight`}>
+            Edit Profil
+          </h2>
+          <p className="text-gray-500 text-xs lg:text-sm">Atur detail profil kamu.</p>
+        </div>
       </div>
 
       {/* FOTO */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-5">
         <div className="relative w-16 h-16 lg:w-20 lg:h-20 flex-shrink-0">
           <Image src={image} alt="profile" fill className="rounded-full object-cover" />
         </div>
@@ -118,11 +131,11 @@ export default function Profile() {
       )}
 
       {/* FORM */}
-      <div className="space-y-3 lg:space-y-4">
+      <div className="space-y-3">
         {[
-          { label: "Nama Lengkap", name: "name", type: "text" },
-          { label: "Email", name: "email", type: "email" },
-          { label: "Domisili", name: "domisili", type: "text" },
+          { label: "Nama Lengkap", name: "name",     type: "text"  },
+          { label: "Email",        name: "email",    type: "email" },
+          { label: "Domisili",     name: "domisili", type: "text"  },
         ].map(field => (
           <div key={field.name}>
             <label className="block text-gray-700 mb-1 text-xs lg:text-sm font-medium">{field.label}</label>
@@ -130,7 +143,6 @@ export default function Profile() {
               onChange={handleChange} className={inputClass} />
           </div>
         ))}
-
         <div>
           <label className="block text-gray-700 mb-1 text-xs lg:text-sm font-medium">Jenis Kelamin</label>
           <select name="gender" value={form.gender} onChange={handleChange} className={inputClass}>
@@ -141,7 +153,7 @@ export default function Profile() {
       </div>
 
       <button onClick={handleSave}
-        className="w-full mt-5 lg:mt-6 rounded-full bg-primary py-2.5 lg:py-3 text-white text-sm lg:text-base font-semibold hover:bg-primary/80 transition">
+        className="w-full mt-5 rounded-full bg-primary py-2.5 lg:py-3 text-white text-sm lg:text-base font-semibold hover:bg-primary/80 transition">
         Simpan
       </button>
 
